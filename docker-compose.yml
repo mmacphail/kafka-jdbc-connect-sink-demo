@@ -45,15 +45,25 @@ services:
     ports:
       - '9092:9092'
 
-  jmxexporter:
+  jmxkafka:
     image: sscaling/jmx-prometheus-exporter
-    container_name: jmxexpoter
+    container_name: jmxkafka
     ports:
       - "5556:5556"
     environment:
       SERVICE_PORT: 5556
     volumes:
       - ./jmxexporter.yml:/opt/jmx_exporter/config.yml
+
+  jmxconnect:
+    image: sscaling/jmx-prometheus-exporter
+    container_name: jmxconnect
+    ports:
+      - "5557:5556"
+    environment:
+      SERVICE_PORT: 5556
+    volumes:
+      - ./connect-jmxexporter.yml:/opt/jmx_exporter/config.yml
 
   kafka2:
     image: confluentinc/cp-kafka:6.0.0
@@ -125,14 +135,16 @@ services:
       CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "true"
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
-      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      # CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      # CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_REST_ADVERTISED_HOST_NAME: "connect"
       CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
       CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
       CONNECT_LOG4J_LOGGERS: org.reflections=ERROR
       # CLASSPATH required due to CC-2422
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-6.0.0.jar
+      KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=connect -Dcom.sun.management.jmxremote.rmi.port=1099"
+      KAFKA_JMX_PORT: 1099
       # Connect worker
       # CONNECT_SECURITY_PROTOCOL: SASL_SSL
       # CONNECT_SASL_JAAS_CONFIG: $SASL_JAAS_CONFIG
@@ -155,3 +167,4 @@ services:
       # CONNECT_CONSUMER_CONFLUENT_MONITORING_INTERCEPTOR_SASL_MECHANISM: PLAIN
     ports:
       - '8083:8080'
+      - '4099:1099'
