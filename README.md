@@ -1,4 +1,8 @@
-# Custom connect
+# Welcome to kafka-jdbc-connect-sink-demo
+
+This demo showcase how to use Confluent Connect docker image with a JDBC Sink. To run this demo, first run `docker-compose up -d`, then connect to the Kafka containter and create the topic, run the kloader app to supply data in it, and finally create the connector using curl.
+
+# Documentation
 
 ## Config reference for docker
 https://docs.confluent.io/current/installation/docker/config-reference.html
@@ -32,6 +36,8 @@ https://docs.confluent.io/platform/current/kafka/monitoring.html
 ## Connect metrics
 
 https://docs.confluent.io/home/connect/monitoring.html#using-jmx-to-monitor-kconnect
+
+# Run the stack
 
 ## Create the topic
 
